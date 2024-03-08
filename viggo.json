@@ -1,0 +1,164 @@
+{
+  "overview": {
+    "where": {
+      "has-leaderboard": "no",
+      "leaderboard-url": "N/A",
+      "leaderboard-description": "N/A",
+      "website": "[Wesbite](https://nlds.soe.ucsc.edu/viggo)",
+      "paper-url": "[ACL Anthology](https://aclanthology.org/W19-8623/)",
+      "paper-bibtext": "```\n@inproceedings{juraska-etal-2019-viggo,\n    title = \"{V}i{GGO}: A Video Game Corpus for Data-To-Text Generation in Open-Domain Conversation\",\n    author = \"Juraska, Juraj  and\n      Bowden, Kevin  and\n      Walker, Marilyn\",\n    booktitle = \"Proceedings of the 12th International Conference on Natural Language Generation\",\n    month = oct # \"{--}\" # nov,\n    year = \"2019\",\n    address = \"Tokyo, Japan\",\n    publisher = \"Association for Computational Linguistics\",\n    url = \"https://aclanthology.org/W19-8623\",\n    doi = \"10.18653/v1/W19-8623\",\n    pages = \"164--172\",\n}\n```",
+      "contact-name": "Juraj Juraska",
+      "contact-email": "jjuraska@ucsc.edu"
+    },
+    "languages": {
+      "is-multilingual": "no",
+      "license": "cc-by-sa-4.0: Creative Commons Attribution Share Alike 4.0 International",
+      "task-other": "N/A",
+      "language-names": [
+        "English"
+      ],
+      "license-other": "N/A",
+      "communicative": "N/A",
+      "task": "Data-to-Text",
+      "intended-use": "ViGGO was designed for the task of data-to-text generation in chatbots (as opposed to task-oriented dialogue systems), with target responses being more conversational than information-seeking, yet constrained to the information presented in a meaning representation. The dataset, being relatively small and clean, can also serve for demonstrating transfer learning capabilities of neural models."
+    },
+    "credit": {
+      "organization-type": [
+        "academic"
+      ],
+      "organization-names": "University of California, Santa Cruz",
+      "creators": "Juraj Juraska, Kevin K. Bowden, Marilyn Walker",
+      "gem-added-by": "Juraj Juraska"
+    },
+    "structure": {
+      "data-fields": "Each example in the dataset has the following two fields:\n\n- `mr`: A meaning representation (MR) that, in a structured format, provides the information to convey, as well as the desired dialogue act (DA) type.\n- `ref`: A reference output, i.e., a corresponding utterance realizing all the information in the MR.\n\nEach MR is a flattened dictionary of attribute-and-value pairs, \"wrapped\" in the dialogue act type indication. This format was chosen primarily for its compactness, but also to allow for easy concatenation of multiple DAs (each with potentially different attributes) in a single MR.\n\nFollowing is the list of all possible attributes (which are also refered to as \"slots\") in ViGGO along with their types/possible values:\n\n- `name`: The name of a video game (e.g., Rise of the Tomb Raider).\n- `release_year`: The year a video game was released in (e.g., 2015).\n- `exp_release_date`: For a not-yet-released game, the date when it is expected to be released (e.g., February 22, 2019). *Note: This slot cannot appear together with `release_year` in the same dialogue act.*\n- `developer`: The name of the studio/person that created the game (e.g., Crystal Dynamics).\n- `genres`: A list of one or more genre labels from a set of possible values (e.g., action-adventure, shooter).\n- `player_perspective`: A list of one or more perspectives from which the game is/can be played (possible values: first person, third person, side view, bird view).\n- `platforms`: A list of one or more gaming platforms the game was officially released for (possible values: PC, PlayStation, Xbox, Nintendo, Nintendo Switch).\n- `esrb`: A game's content rating as determined by the ESRB (possible values: E (for Everyone), E 10+ (for Everyone 10 and Older), T (for Teen), M (for Mature)).\n- `rating`: Depending on the dialogue act this slot is used with, it is a categorical representation of either the game's average rating or the game's liking (possible values: excellent, good, average, poor).\n- `has_multiplayer`: Indicates whether a game supports multiplayer or can only be played in single-player mode (possible values: yes, no).\n- `available_on_steam`: Indicates whether a game can be purchased through the Steam digital distribution service (possible values: yes, no).\n- `has_linux_release`: Indicates whether a game is supported on Linux operating systems (possible values: yes, no).\n- `has_mac_release`: Indicates whether a game is supported on macOS (possible values: yes, no).\n- `specifier`: A game specifier used by the `request` DA, typically an adjective (e.g., addictive, easiest, overrated, visually impressive).\n\nEach MR in the dataset has 3 distinct reference utterances, which are represented as 3 separate examples with the same MR.",
+      "structure-description": "The dataset structure mostly follows the format of the popular E2E dataset, however, with added dialogue act type indications, new list-type attributes introduced, and unified naming convention for multi-word attribute names.",
+      "structure-example": "```\n{\n    \"mr\": \"give_opinion(name[SpellForce 3], rating[poor], genres[real-time strategy, role-playing], player_perspective[bird view])\",\n    \"ref\": \"I think that SpellForce 3 is one of the worst games I've ever played. Trying to combine the real-time strategy and role-playing genres just doesn't work, and the bird view perspective makes it near impossible to play.\"\n}\n```",
+      "structure-splits": "ViGGO is split into 3 partitions, with no MRs in common between the training set and either of the validation and the test set (and that *after* delexicalizing the `name` and `developer` slots). The ratio of examples in the partitions is approximately 7.5 : 1 : 1.5, with their exact sizes listed below:\n\n- **Train:** 5,103 (1,675 unique MRs)\n- **Validation:** 714 (238 unique MRs)\n- **Test:** 1,083 (359 unique MRs)\n- **TOTAL:** 6,900 (2,253 unique MRs)\n\n*Note: The reason why the number of unique MRs is not exactly one third of all examples is that for each `request_attribute` DA (which only has one slot, and that without a value) 12 reference utterances were collected instead of 3.*",
+      "structure-splits-criteria": "A similar MR length and slot distribution was preserved across the partitions. The distribution of DA types, on the other hand, is skewed slightly toward fewer `inform` DA instances (the most prevalent DA type) and a higher proportion of the less prevalent DAs in the validation and the test set.",
+      "structure-outlier": "```\n{\n    \"mr\": \"request_attribute(player_perspective[])\",\n    \"ref\": \"Is there a certain player perspective that you prefer over others in games you play?\"\n},\n{\n    \"mr\": \"inform(name[FIFA 12], esrb[E (for Everyone)], genres[simulation, sport], player_perspective[bird view, side view], platforms[PlayStation, Xbox, Nintendo, PC], available_on_steam[no])\",\n    \"ref\": \"Fifa 12 is a decent sports simulator. It's pretty cool how the game swaps from the bird's eye perspective down to a side view while you're playing. You can get the game for PlayStation, Xbox, Nintendo consoles, and PC, but unfortunately it's not on Steam. Of course, as a sports game there's not much objectionable content so it's rated E.\"\n},\n{\n    \"mr\": \"inform(name[Super Bomberman], release_year[1993], genres[action, strategy], has_multiplayer[no], platforms[Nintendo, PC], available_on_steam[no], has_linux_release[no], has_mac_release[no])\",\n    \"ref\": \"Super Bomberman is one of my favorite Nintendo games, also available on PC, though not through Steam. It came out all the way back in 1993, and you can't get it for any modern consoles, unfortunately, so no online multiplayer, or of course Linux or Mac releases either. That said, it's still one of the most addicting action-strategy games out there.\"\n}\n```"
+    },
+    "what": {
+      "dataset": "ViGGO is an English data-to-text generation dataset in the video game domain, with target responses being more conversational than information-seeking, yet constrained to the information presented in a meaning representation. The dataset is relatively small with about 5,000 datasets but very clean, and can thus serve for evaluating transfer learning, low-resource, or few-shot capabilities of neural models."
+    }
+  },
+  "curation": {
+    "original": {
+      "rationale": "The primary motivation behind ViGGO was to create a data-to-text corpus in a new but conversational domain, and intended for use in open-domain chatbots rather than task-oriented dialogue systems. To this end, the dataset contains utterances of 9 generalizable and conversational dialogue act types, revolving around various aspects of video games. The idea is that similar, relatively small datasets could fairly easily be collected for other conversational domains -- especially other entertainment domains (such as music or books), but perhaps also topics like animals or food -- to support an open-domain conversational agent with controllable neural NLG.\n\nAnother desired quality of the ViGGO dataset was cleanliness (no typos and grammatical errors) and semantic accuracy, which has often not been the case with other crowdsourced data-to-text corpora. In general, for the data-to-text generation task, there is arguably no need to put the burden on the generation model to figure out the noise, since the noise would not be expected to be there in a real-world system whose dialogue manager that creates the input for the NLG module is usually configurable and tightly controlled.",
+      "communicative": "Produce a response from a structured meaning representation in the context of a conversation about video games. It can be a brief opinion or a description of a game, as well as a request for attribute (e.g., genre, player perspective, or platform) preference/confirmation or an inquiry about liking a particular type of games.",
+      "is-aggregated": "no",
+      "aggregated-sources": "N/A"
+    },
+    "language": {
+      "obtained": [
+        "Crowdsourced"
+      ],
+      "found": [],
+      "crowdsourced": [
+        "Amazon Mechanical Turk"
+      ],
+      "created": "N/A",
+      "machine-generated": "N/A",
+      "producers-description": "The paid crowdworkers who produced the reference utterances were from English-speaking countries, and they had at least 1,000 HITs approved and a HIT approval rate of 98% or more. Furthermore, in the instructions, crowdworkers were discouraged from taking on the task unless they considered themselves a gamer.",
+      "topics": "The dataset focuses on video games and their various aspects, and hence the language of the utterances may contain video game-specific jargon.",
+      "validated": "validated by data curator",
+      "pre-processed": "First, regular expressions were used to enforce several standardization policies regarding special characters, punctuation, and the correction of undesired abbreviations/misspellings of standard domain-specific terms (e.g., terms like \"Play station\" or \"PS4\" would be changed to the uniform \"PlayStation\"). At the same time, hyphens were removed or enforced uniformly in certain terms, for example, \"single-player\". Although phrases such as \"first person\" should correctly have a hyphen when used as adjective, the crowdworkers used this rule very inconsistently. In order to avoid model outputs being penalized during the evaluation by the arbitrary choice of a hyphen presence or absence in the reference utterances, the hyphen was removed in all such phrases regardless of the noun vs. adjective use.\n\nSecond, an extensive set of heuristics was developed to identify slot-related errors. This process revealed the vast majority of missing or incorrect slot mentions, which were subsequently fixed according to the corresponding MRs. This eventually led to the development of a robust, cross-domain, heuristic slot aligner that can be used for automatic slot error rate evaluation. For details, see the appendix in [Juraska and Walker, 2021](https://aclanthology.org/2021.inlg-1.45/).\n\nCrowdworkers would sometimes also inject a piece of information which was not present in the MR, some of which is not even represented by any of the slots, e.g., plot or main characters. This unsolicited information was removed from the utterances so as to avoid confusing the neural model. Finally, any remaining typos and grammatical errors were resolved.",
+      "is-filtered": "manually",
+      "filtered-criteria": "Compliance with the indicated dialogue act type, semantic accuracy (i.e., all information in the corresponding MR mentioned and that correctly), and minimal extraneous information (e.g., personal experience/opinion). Whenever it was within a reasonable amount of effort, the utterances were manually fixed instead of being discarded/crowdsourced anew."
+    },
+    "annotations": {
+      "origin": "none",
+      "rater-number": "N/A",
+      "rater-qualifications": "N/A",
+      "rater-training-num": "N/A",
+      "rater-test-num": "N/A",
+      "rater-annotation-service-bool": "no",
+      "rater-annotation-service": [],
+      "values": "N/A",
+      "quality-control": [],
+      "quality-control-details": "N/A"
+    },
+    "consent": {
+      "has-consent": "no",
+      "consent-policy": "N/A",
+      "consent-other": "N/A"
+    },
+    "pii": {
+      "has-pii": "no PII",
+      "no-pii-justification": "Crowdworkers were instructed to only express the information in the provided meaning representation, which never prompted them to mention anything about themselves. Occasionally, they would still include a bit of personal experience (e.g., \"I used to like the game as a kid.\") or opinion, but these would be too general to be considered PII.",
+      "pii-categories": [],
+      "is-pii-identified": "N/A",
+      "pii-identified-method": "N/A",
+      "is-pii-replaced": "N/A",
+      "pii-replaced-method": "N/A"
+    },
+    "maintenance": {
+      "has-maintenance": "no",
+      "description": "N/A",
+      "contact": "N/A",
+      "contestation-mechanism": "N/A",
+      "contestation-link": "N/A",
+      "contestation-description": "N/A"
+    }
+  },
+  "context": {
+    "previous": {
+      "is-deployed": "no",
+      "described-risks": "N/A",
+      "changes-from-observation": "N/A"
+    },
+    "underserved": {
+      "helps-underserved": "no",
+      "underserved-description": "N/A"
+    },
+    "biases": {
+      "has-biases": "no",
+      "bias-analyses": "N/A"
+    }
+  },
+  "gem": {
+    "rationale": {
+      "contribution": "ViGGO is a fairly small dataset but includes a greater variety of utterance types than most other datasets for NLG from structured meaning representations. This makes it more interesting from the perspective of model evaluation, since models have to learn to differentiate between various dialogue act types that share the same slots.",
+      "sole-task-dataset": "yes",
+      "sole-language-task-dataset": "no",
+      "distinction-description": "ViGGO's language is more casual and conversational -- as opposed to information-seeking -- which differentiates it from the majority of popular datasets for the same type of data-to-text task. Moreover, the video game domain is a rather uncommon one in the NLG community, despite being very well-suited for data-to-text generation, considering it offers entities with many attributes to talk about, which can be described in a structured format."
+    },
+    "curation": {
+      "has-additional-curation": "no",
+      "modification-types": [],
+      "modification-description": "N/A",
+      "has-additional-splits": "no",
+      "additional-splits-description": "N/A",
+      "additional-splits-capacicites": "N/A"
+    },
+    "starting": {
+      "research-pointers": "- [E2E NLG Challenge](http://www.macs.hw.ac.uk/InteractionLab/E2E/)",
+      "technical-terms": "- MR = meaning representation\n- DA = dialogue act"
+    }
+  },
+  "results": {
+    "results": {
+      "metrics": [
+        "BLEU",
+        "METEOR",
+        "ROUGE",
+        "BERT-Score",
+        "BLEURT",
+        "Other: Other Metrics"
+      ],
+      "other-metrics-definitions": "SER (slot error rate): Indicates the proportion of missing/incorrect/duplicate/hallucinated slot mentions in the utterances across a test set. The closer to zero a model scores in this metric, the more semantically accurate its outputs are. This metric is typically calculated either manually on a small sample of generated outputs, or heuristically using domain-specific regex rules and gazetteers.",
+      "has-previous-results": "yes",
+      "previous-results": "- [Juraska et al., 2019. ViGGO: A Video Game Corpus for Data-To-Text Generation in Open-Domain Conversation.](https://aclanthology.org/W19-8623/)\n- [Harkous et al., 2020. Have Your Text and Use It Too! End-to-End Neural Data-to-Text Generation with Semantic Fidelity.](https://aclanthology.org/2020.coling-main.218/)\n- [Kedzie and McKeown, 2020. Controllable Meaning Representation to Text Generation: Linearization and Data Augmentation Strategies.](https://aclanthology.org/2020.emnlp-main.419/)\n- [Juraska and Walker, 2021. Attention Is Indeed All You Need: Semantically Attention-Guided Decoding for Data-to-Text NLG.](https://aclanthology.org/2021.inlg-1.45/)"
+    }
+  },
+  "considerations": {
+    "pii": {},
+    "licenses": {
+      "dataset-restrictions-other": "N/A",
+      "data-copyright-other": "N/A"
+    },
+    "limitations": {
+      "data-technical-limitations": "The dataset is limited to a single domain: video games. One caveat of using a language generator trained on this dataset in a dialogue system as-is is that multiple subsequent turns discussing the same video game would be repeating its full name. ViGGO was designed for generation without context, and therefore it is up to the dialogue manager to ensure that pronouns are substituted for the names whenever it would sound more natural in a dialogue. Alternately, the dataset can easily be augmented with automatically constructed samples which omit the `name` slot in the MR and replace the name with a pronoun in the reference utterance."
+    }
+  }
+}
